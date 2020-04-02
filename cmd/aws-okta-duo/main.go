@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"strings"
@@ -22,8 +23,9 @@ var (
 	}
 
 	execCmd = &cobra.Command{
-		Use:  "exec -- [cmd...]",
-		Args: cobra.MinimumNArgs(1),
+		Use:   "exec -- [cmd...]",
+		Short: "Execute a command within an authenticated AWS session",
+		Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			do(func() error {
 				stsClient := sts.New(session.Must(session.NewSession()))
@@ -75,10 +77,32 @@ var (
 			})
 		},
 	}
+
+	loginCmd = &cobra.Command{
+		Use:   "login",
+		Short: "Open the web console for the given AWS account",
+		Args:  cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			do(func() error {
+				url := url.URL{
+					Scheme: "https",
+					Host:   viper.GetString("okta-host"),
+					Path:   viper.GetString("okta-app-path"),
+				}
+
+				argv0, err := exec.LookPath("open")
+				if err != nil {
+					return err
+				}
+
+				return unix.Exec(argv0, []string{"open", url.String()}, os.Environ())
+			})
+		},
+	}
 )
 
 func init() {
-	rootCmd.AddCommand(execCmd)
+	rootCmd.AddCommand(execCmd, loginCmd)
 
 	rootCmd.PersistentFlags().String("okta-session-id", "", "An existing Okta session ID to try to use instead of authenticating")
 	rootCmd.PersistentFlags().String("okta-host", "", "The host that your Okta organization is served from (required)")
