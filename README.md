@@ -7,6 +7,9 @@ With `aws-okta-duo`, you'll be able to create convenient AWS automation tools
 without sacrificing security:
 
 ```bash
+# See later in this README for how you can build a command like aws-prod as an
+# alias over aws-okta-duo.
+#
 # List s3 buckets in the production AWS account.
 aws-prod exec -- aws s3 ls
 
@@ -54,7 +57,7 @@ AWS_OKTA_DUO_OKTA_USERNAME="xxx" \
 Which, once you fill in those environment variables with the appropriate values
 (see ["How to find your Okta host and app
 path"](#how-to-find-your-okta-host-and-app-path) for guidance on this), you'll
-the usual `aws s3 ls` output to appear, within the context of the AWS account
+see the usual `aws s3 ls` output appear, within the context of the AWS account
 you specified. You'll get a push notification from Duo in the process, too.
 
 Under the hood, this works by executing your command with the [special AWS
@@ -145,6 +148,10 @@ aws-prod login
 > repo. You'll first need to update those scripts to use your organization's
 > Okta domain and app paths.
 >
+> See ["How to find your Okta host and app
+> path"](#how-to-find-your-okta-host-and-app-path) for how to fill in the
+> scripts in the `examples` directory.
+>
 > From the directory that this README is in, you can test them by running:
 >
 > ```bash
@@ -179,6 +186,10 @@ AWS_OKTA_DUO_OKTA_SESSION_ID=$session_id \
   AWS_OKTA_DUO_SAVE_SESSION_CMD=aws-okta-duo-wrapper-save-session \
   aws-okta-duo $@
 ```
+
+See ["How to find your Okta host and app
+path"](#how-to-find-your-okta-host-and-app-path) for how to to fill in the
+fields marked "fill this in" above.
 
 This `aws-prod` command just forwards all of the arguments you gave it to
 `aws-okta-duo`, but with some environment variables loaded from the MacOS
